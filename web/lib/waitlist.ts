@@ -13,7 +13,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // serverless). Gmail SMTP is the alternative sender. Whichever is configured wins.
 const RESEND_KEY = process.env.RESEND_API_KEY;
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
-const RESEND_FROM = process.env.RESEND_FROM ?? "Praxis AI <onboarding@resend.dev>";
+// No default: sending only turns on once a from-address is explicitly set. This
+// lets you run "capture-only" (store contacts) by setting just the key + audience.
+const RESEND_FROM = process.env.RESEND_FROM;
 const BASE_POSITION = Number(process.env.WAITLIST_BASE_POSITION) || QUEUE_POSITION;
 
 const canStore = Boolean(RESEND_KEY && AUDIENCE_ID);
@@ -87,7 +89,7 @@ export async function joinWaitlist(
   } else if (canSendResend && resend) {
     try {
       const { error } = await resend.emails.send({
-        from: RESEND_FROM,
+        from: RESEND_FROM!, // guaranteed by canSendResend
         to: email,
         subject: "You're on the Praxis AI waitlist 🎉",
         html: welcomeEmail(position),
