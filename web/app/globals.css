@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/* ── Digital Twilight design tokens ───────────────────────────── */
+@theme {
+  /* Base surfaces */
+  --color-obsidian: #0a0a0c;
+  --color-graphite: #161619;
+  --color-well: #0c0c0f;
+  --color-well-2: #0d0d10;
+  --color-panel: #101014;
+  --color-panel-2: #15151a;
+  --color-panel-3: #121217;
+
+  /* Hairlines */
+  --color-line: #1f1f24;
+  --color-line-2: #26262b;
+  --color-line-3: #2a2a30;
+  --color-line-4: #3a3a41;
+
+  /* Text */
+  --color-frost: #f3f4f6;
+  --color-ink: #c9cad1;
+  --color-muted: #a6a7ad;
+  --color-dim: #8a8b92;
+  --color-faint: #6b6b72;
+  --color-ghost: #55565e;
+
+  /* Accent */
+  --color-cyan: #00f0ff;
+  --color-cyan-bright: #6ff7ff;
+  --color-cyan-pale: #9ef7fd;
+  --color-cyan-ice: #7df3fc;
+
+  --font-sans: var(--font-geist-sans), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-obsidian);
+}
+
+body {
+  color: var(--color-frost);
+  font-family: var(--font-sans);
+  font-feature-settings: "tnum";
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(0, 240, 255, 0.25);
+}
+
+input::placeholder {
+  color: var(--color-faint);
+}
+
+/* Numeric UI that should read as an instrument panel */
+.tnum {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
+}
+
+/* ── Scroll-reveal motion (driven by ScrollMotion.tsx) ────────── */
+@keyframes feedIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-feed-in {
+  animation: feedIn 0.35s ease;
+}
