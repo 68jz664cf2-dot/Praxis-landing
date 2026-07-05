@@ -37,30 +37,35 @@ npm run start    # serve the production build
 Interactive behavior (feed ticking, step auto-advance, approve/reject, waitlist
 success with queue position) is verified end-to-end at desktop and mobile widths.
 
-## Waitlist (Resend)
+## Waitlist (Gmail send + Resend list)
 
-Both signup forms POST to `app/api/waitlist/route.ts`, which calls
-`lib/waitlist.ts`:
+Both signup forms POST to `app/api/waitlist/route.ts` → `lib/waitlist.ts`, which:
 
 1. Validates + normalizes the email.
-2. Stores the signup as a contact in a **Resend Audience**.
-3. Sends an on-brand **welcome email** (`lib/welcome-email.ts`) with the queue
-   position.
+2. Stores the signup as a contact in a **Resend Audience** (`lib/waitlist.ts`).
+3. Sends an on-brand **welcome email** from **Gmail SMTP** (`lib/mailer.ts`,
+   template in `lib/welcome-email.ts`) and a "new signup" heads-up to you.
+
+The two sinks are independent and best-effort: a signup only fails if *every*
+configured sink fails. With no credentials at all, it runs in a **dev fallback**
+that captures + logs locally so the form works immediately.
 
 ### Config
 
-Copy `.env.example` → `.env.local` and fill in:
+Copy `.env.example` → `.env.local` (or set these in your host):
 
-| Variable                 | Purpose                                                        |
-| ------------------------ | ------------------------------------------------------------- |
-| `RESEND_API_KEY`         | Resend API key. **Without it, the form runs in dev mode** — signups are captured/logged locally, no external calls. |
-| `RESEND_AUDIENCE_ID`     | Audience to store contacts in.                                |
-| `RESEND_FROM`            | Verified sender (defaults to Resend's shared test sender).    |
-| `WAITLIST_BASE_POSITION` | Number shown as the queue position (default `4201`).          |
+| Variable                 | Purpose                                                                 |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `GMAIL_USER`             | Gmail address that sends the welcome email.                             |
+| `GMAIL_APP_PASSWORD`     | 16-char **App Password** (needs 2-Step Verification). Never your login. |
+| `GMAIL_NOTIFY`           | Where "new signup" alerts go (defaults to `GMAIL_USER`).               |
+| `RESEND_API_KEY`         | Resend API key — stores signups as contacts.                           |
+| `RESEND_AUDIENCE_ID`     | Resend Audience to store contacts in.                                   |
+| `WAITLIST_BASE_POSITION` | Number shown as the queue position (default `4201`).                    |
 
-The dev-mode fallback means the page works immediately with no credentials; add
-the key to go live. Verify a domain in Resend before using a real `RESEND_FROM`.
+Gmail App Password: enable 2-Step Verification, then create one at
+<https://myaccount.google.com/apppasswords>. Free Gmail sends ~500 emails/day
+(Workspace ~2,000); for higher volume move to a domain-verified sender.
 
-> Queue position is a fixed marketing anchor (Resend has no cheap audience-count
-> call). For a truly incrementing position, back it with a datastore counter in
-> `lib/waitlist.ts`.
+> Queue position is a fixed marketing anchor. For a truly incrementing position,
+> back it with a datastore counter in `lib/waitlist.ts`.

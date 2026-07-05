@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { QUEUE_POSITION } from "./data";
-import { welcomeEmail } from "./welcome-email";
+import { gmailConfigured, sendWelcomeEmail, notifyFounder } from "./mailer";
 
 export type WaitlistResult =
   | { ok: true; position: number; alreadyJoined: boolean }
@@ -8,15 +8,14 @@ export type WaitlistResult =
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const API_KEY = process.env.RESEND_API_KEY;
+// Resend stores the contact list; Gmail (SMTP) sends the welcome email.
+const RESEND_KEY = process.env.RESEND_API_KEY;
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
-const FROM = process.env.RESEND_FROM ?? "Praxis AI <onboarding@resend.dev>";
 const BASE_POSITION = Number(process.env.WAITLIST_BASE_POSITION) || QUEUE_POSITION;
 
 /**
- * The displayed queue position. Resend has no cheap "audience size" call, so we
- * anchor on a configured base (matches the launch design). Swap in a datastore
- * counter here if you want a truly incrementing position.
+ * The displayed queue position — a configured marketing anchor. Swap in a
+ * datastore counter here if you want a truly incrementing position.
  */
 function queuePosition(): number {
   return BASE_POSITION;
@@ -31,56 +30,60 @@ export async function joinWaitlist(
     return { ok: false, error: "Please enter a valid email address." };
   }
 
-  // Dev fallback: no key configured → capture succeeds without external calls,
-  // so the form is fully functional locally. Add RESEND_API_KEY to go live.
-  if (!API_KEY) {
+  const position = queuePosition();
+  const resendConfigured = Boolean(RESEND_KEY && AUDIENCE_ID);
+
+  // Dev fallback: nothing configured → capture succeeds without external calls,
+  // so the form is fully functional locally. Add creds to go live.
+  if (!resendConfigured && !gmailConfigured) {
     console.warn(
-      `[waitlist] RESEND_API_KEY not set — captured ${email} (${source}) in dev mode; no contact/email sent.`,
+      `[waitlist] no Resend/Gmail creds — captured ${email} (${source}) in dev mode; nothing sent/stored.`,
     );
-    return { ok: true, position: queuePosition(), alreadyJoined: false };
+    return { ok: true, position, alreadyJoined: false };
   }
 
-  const resend = new Resend(API_KEY);
   let alreadyJoined = false;
+  let storeFailed = false;
+  let emailFailed = false;
 
-  // 1. Store the signup as a contact in the audience.
-  if (AUDIENCE_ID) {
+  // 1. Store the signup as a contact in the Resend Audience.
+  if (resendConfigured) {
     try {
+      const resend = new Resend(RESEND_KEY);
       const { error } = await resend.contacts.create({
         email,
-        audienceId: AUDIENCE_ID,
+        audienceId: AUDIENCE_ID!,
         unsubscribed: false,
       });
       if (error) {
-        // Treat "already exists" as a soft success rather than a failure.
         if (/already|exist/i.test(error.message)) alreadyJoined = true;
-        else console.error("[waitlist] contact.create failed:", error.message);
+        else {
+          storeFailed = true;
+          console.error("[waitlist] contact.create failed:", error.message);
+        }
       }
     } catch (err) {
+      storeFailed = true;
       console.error("[waitlist] contact.create threw:", err);
     }
-  } else {
-    console.warn("[waitlist] RESEND_AUDIENCE_ID not set — skipping contact storage.");
   }
 
-  // 2. Send the branded welcome email.
-  const position = queuePosition();
-  try {
-    const { error } = await resend.emails.send({
-      from: FROM,
-      to: email,
-      subject: "You're on the Praxis AI waitlist 🎉",
-      html: welcomeEmail(position),
-    });
-    if (error) {
-      console.error("[waitlist] email.send failed:", error.message);
-      // If we couldn't store the contact AND couldn't email, surface a failure.
-      if (!AUDIENCE_ID) {
-        return { ok: false, error: "Something went wrong. Please try again." };
-      }
+  // 2. Send the welcome email from Gmail (and a founder notification).
+  if (gmailConfigured) {
+    try {
+      await sendWelcomeEmail(email, position);
+    } catch (err) {
+      emailFailed = true;
+      console.error("[waitlist] welcome email failed:", err);
     }
-  } catch (err) {
-    console.error("[waitlist] email.send threw:", err);
+    void notifyFounder(email, source); // fire-and-forget, never throws
+  }
+
+  // If every configured sink failed, we truly didn't record the signup.
+  const configuredCount = (resendConfigured ? 1 : 0) + (gmailConfigured ? 1 : 0);
+  const failedCount = (storeFailed ? 1 : 0) + (emailFailed ? 1 : 0);
+  if (configuredCount > 0 && failedCount === configuredCount) {
+    return { ok: false, error: "Something went wrong. Please try again." };
   }
 
   return { ok: true, position, alreadyJoined };
