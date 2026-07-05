@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #0A0A0C; }
+  * { box-sizing: border-box; }
+  ::selection { background: rgba(0,240,255,0.25); }
+  input::placeholder { color: #6B6B72; }
+  @keyframes feedIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: #0A0A0C; color: #F3F4F6; font-family: 'Geist', 'Inter', system-ui, sans-serif; font-feature-settings: 'tnum'; position: relative; overflow-x: hidden;">
+
+  <!-- soft technical grid -->
+  <sc-if value="{{ gridOn }}" hint-placeholder-val="{{ true }}">
+    <div style="position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(to right, rgba(243,244,246,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(243,244,246,0.03) 1px, transparent 1px); background-size: 80px 80px;"></div>
+  </sc-if>
+
+  <!-- STICKY HEADER -->
+  <header style="position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(16px, 4vw, 48px); height: 60px; background: rgba(10,10,12,0.82); backdrop-filter: blur(12px); border-bottom: 1px solid #1F1F24;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 28px; height: 28px; border: 1.5px solid #F3F4F6; border-radius: 3px; display: flex; align-items: center; justify-content: center;"><div style="width: 13px; height: 13px; border: 1.5px solid #00F0FF; transform: rotate(-9deg); box-shadow: 0 0 8px rgba(0,240,255,0.55), inset 0 0 4px rgba(0,240,255,0.25);"></div></div>
+      <span style="display: flex; align-items: baseline; gap: 8px;"><span style="font-weight: 700; letter-spacing: 0.04em; font-size: 16px;">PRAXIS</span><span style="font-weight: 500; font-size: 13px; color: #8A8B92;">AI</span></span>
+    </div>
+    <a href="#waitlist" style="display: inline-flex; align-items: center; height: 38px; padding: 0 20px; border-radius: 10px; background: #00F0FF; color: #0A0A0C; font-weight: 600; font-size: 14px; text-decoration: none;" style-hover="background: #6FF7FF;">Join waitlist</a>
+    <div ref="{{ progressRef }}" style="position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; background: #00F0FF; transform: scaleX(0); transform-origin: left; pointer-events: none;"></div>
+  </header>
+
+  <!-- ============ 1. HERO ============ -->
+  <section data-screen-label="Hero" style="position: relative; z-index: 1; padding: clamp(56px, 9vw, 120px) clamp(16px, 4vw, 48px) clamp(48px, 6vw, 96px); max-width: 1280px; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: clamp(32px, 5vw, 72px); align-items: center;">
+      <div data-reveal-group style="display: flex; flex-direction: column; gap: 24px;">
+        <div style="display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(0,240,255,0.35); background: rgba(0,240,255,0.06); font-size: 13px; color: #9EF7FD; font-weight: 500;">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #00F0FF;"></span>
+          Early access is open
+        </div>
+        <h1 style="margin: 0; font-size: clamp(38px, 5.4vw, 68px); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance;">The Engine for Autonomous Companies.</h1>
+        <p style="margin: 0; font-size: clamp(16px, 1.7vw, 20px); line-height: 1.55; color: #A6A7AD; max-width: 46ch;">Connect your business. Set your limits. Let AI operate the rest.</p>
+        <p style="margin: 0; font-size: clamp(14px, 1.4vw, 16px); line-height: 1.6; color: #8A8B92; max-width: 48ch;">You bring the idea. Praxis becomes your whole back office — sales, ads, inventory, email, support — a team of departments that never sleeps.</p>
+        <sc-if value="{{ heroPending }}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{ submitHero }}" style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 480px;">
+            <input ref="{{ heroEmailRef }}" type="email" required placeholder="you@yourstore.com" style="flex: 1 1 220px; height: 50px; padding: 0 18px; border-radius: 12px; background: #161619; border: 1px solid #2A2A30; color: #F3F4F6; font-size: 15px; outline: none;" style-focus="border-color: #00F0FF;">
+            <button type="submit" style="height: 50px; padding: 0 24px; border-radius: 12px; background: #00F0FF; color: #0A0A0C; border: none; font-weight: 600; font-size: 15px; font-family: inherit; cursor: pointer;" style-hover="background: #6FF7FF;">Request early access</button>
+          </form>
+        </sc-if>
+        <sc-if value="{{ heroDone }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width: 480px; border: 1px solid rgba(0,240,255,0.4); border-radius: 14px; background: rgba(0,240,255,0.05); padding: 18px 20px; font-size: 14.5px; line-height: 1.7;">
+            <div style="font-weight: 600;">You're in — #{{ queuePosition }} on the waitlist. 🎉</div>
+            <div style="color: #A6A7AD;">Invite two friends who run stores and jump ahead 1,000 spots.</div>
+          </div>
+        </sc-if>
+        <div style="font-size: 13.5px; color: #6B6B72;">No demo calls. No credit card. Cancel anytime.</div>
+      </div>
+
+      <!-- Friendly agent activity feed -->
+      <div data-reveal style="border: 1px solid #26262B; border-radius: 20px; background: #101014; display: flex; flex-direction: column; min-height: 420px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.45);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #1F1F24;">
+          <span style="font-weight: 600; font-size: 15px;">Your team of agents, working right now</span>
+          <span style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #9EF7FD;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #00F0FF;"></span>Live</span>
+        </div>
+        <div style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden;">
+          <sc-for list="{{ feedItems }}" as="item" hint-placeholder-count="5">
+            <div style="display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: #15151A; border: 1px solid #1F1F24; animation: feedIn 0.35s ease;">
+              <div style="width: 38px; height: 38px; border-radius: 11px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; color: #7DF3FC; flex-shrink: 0;">{{ item.initials }}</div>
+              <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+                <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                  <span style="font-weight: 600; font-size: 14px;">{{ item.name }}</span>
+                  <span style="font-size: 12px; color: #6B6B72; font-family: 'Geist Mono', monospace;">{{ item.time }}</span>
+                </div>
+                <div style="font-size: 14px; line-height: 1.45; color: #C9CAD1;">{{ item.msg }}</div>
+              </div>
+              <span style="flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(0,240,255,0.1); color: #7DF3FC; white-space: nowrap;">{{ item.chip }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #1F1F24; background: #0D0D10;">
+          <div style="padding: 14px 20px;">
+            <div style="font-size: 12px; color: #6B6B72;">Actions today</div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 19px; font-weight: 600;">{{ actionCount }}</div>
+          </div>
+          <div style="padding: 14px 20px; border-left: 1px solid #1F1F24;">
+            <div style="font-size: 12px; color: #6B6B72;">Margin protected</div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 19px; font-weight: 600;">38.0%</div>
+          </div>
+          <div style="padding: 14px 20px; border-left: 1px solid #1F1F24;">
+            <div style="font-size: 12px; color: #6B6B72;">Waiting on you</div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 19px; font-weight: 600; color: #00F0FF;">1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. THE VALIDATION GAP ============ -->
+  <section data-screen-label="Validation Gap" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 40px;">
+      <div data-reveal style="display: flex; flex-direction: column; gap: 16px;">
+        <div data-reveal="trace" style="width: 48px; height: 2px; background: #00F0FF; transform-origin: left;"></div>
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600;">The problem</div>
+        <h2 style="margin: 0; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; max-width: 22ch; text-wrap: balance;">Your growth is bottlenecked by manual execution.</h2>
+      </div>
+      <div data-reveal-group style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px;">
+        <div style="background: #101014; border: 1px solid #26262B; border-radius: 18px; padding: clamp(24px, 3vw, 40px); display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 13px; color: #6B6B72; font-weight: 600;">Today</div>
+          <div style="font-size: clamp(18px, 2vw, 24px); font-weight: 600; line-height: 1.35;">Copilots only suggest.</div>
+          <p style="margin: 0; color: #A6A7AD; line-height: 1.6; font-size: 15px;">Every recommendation still routes through you. Ad budgets, reorders, price changes — a queue of decisions that only grows with your store.</p>
+        </div>
+        <div style="background: #101014; border: 1px solid rgba(0,240,255,0.3); border-radius: 18px; padding: clamp(24px, 3vw, 40px); display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 13px; color: #7DF3FC; font-weight: 600;">With Praxis</div>
+          <div style="font-size: clamp(18px, 2vw, 24px); font-weight: 600; line-height: 1.35;">You get a system that operates.</div>
+          <p style="margin: 0; color: #A6A7AD; line-height: 1.6; font-size: 15px;">Praxis handles the busywork inside limits you set, and only taps you on the shoulder for the decisions that really matter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. DASHBOARD REVEAL ============ -->
+  <section data-screen-label="Dashboard Reveal" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24; background: #0C0C0F;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: clamp(32px, 5vw, 72px); align-items: start;">
+      <div data-reveal-group style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600; margin-bottom: 18px;">How it works</div>
+        <button onClick="{{ selectStep0 }}" style="{{ step0Style }}">
+          <span style="width: 34px; height: 34px; border-radius: 10px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0;">1</span>
+          <span style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+            <span style="font-weight: 600; font-size: 17px;">Connect your tools</span>
+            <span style="color: #A6A7AD; font-size: 14px; line-height: 1.5;">One-click sign-in to Shopify, Meta, Klaviyo, and Stripe. Takes about two minutes.</span>
+          </span>
+        </button>
+        <button onClick="{{ selectStep1 }}" style="{{ step1Style }}">
+          <span style="width: 34px; height: 34px; border-radius: 10px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0;">2</span>
+          <span style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+            <span style="font-weight: 600; font-size: 17px;">Set your limits</span>
+            <span style="color: #A6A7AD; font-size: 14px; line-height: 1.5;">Your margin floor, your spend ceiling, your approval threshold. The agents can never cross them.</span>
+          </span>
+        </button>
+        <button onClick="{{ selectStep2 }}" style="{{ step2Style }}">
+          <span style="width: 34px; height: 34px; border-radius: 10px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0;">3</span>
+          <span style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+            <span style="font-weight: 600; font-size: 17px;">Let it run</span>
+            <span style="color: #A6A7AD; font-size: 14px; line-height: 1.5;">Agents take over the daily grind — and check in with you only when something big comes up.</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Panel mockup -->
+      <div data-reveal style="border: 1px solid #26262B; border-radius: 20px; background: #101014; min-height: 420px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.45);">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 14px 20px; border-bottom: 1px solid #1F1F24;">
+          <span style="width: 10px; height: 10px; border-radius: 50%; background: #2A2A30;"></span>
+          <span style="width: 10px; height: 10px; border-radius: 50%; background: #2A2A30;"></span>
+          <span style="font-size: 13px; color: #6B6B72; margin-left: 8px;">app.praxis.ai — {{ panelTitle }}</span>
+        </div>
+        <sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px; font-size: 14.5px;"><span style="font-weight: 500;">Shopify</span><span style="color: #7DF3FC; font-size: 13px; font-weight: 600;">✓ Connected</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px; font-size: 14.5px;"><span style="font-weight: 500;">Meta Ads</span><span style="color: #7DF3FC; font-size: 13px; font-weight: 600;">✓ Connected</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px; font-size: 14.5px;"><span style="font-weight: 500;">Klaviyo</span><span style="color: #7DF3FC; font-size: 13px; font-weight: 600;">✓ Connected</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px; font-size: 14.5px;"><span style="font-weight: 500;">Stripe</span><span style="color: #A6A7AD; font-size: 13px;">Connecting…</span></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 13px; color: #A6A7AD;">Never let my margin drop below</span><span style="font-family: 'Geist Mono', monospace; font-size: 21px; font-weight: 600;">38.0%</span></div>
+              <span style="font-size: 12px; font-weight: 600; color: #7DF3FC; background: rgba(0,240,255,0.1); border-radius: 999px; padding: 5px 12px;">🔒 Locked</span>
+            </div>
+            <div style="background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 13px; color: #A6A7AD;">Max ad spend per day</span><span style="font-family: 'Geist Mono', monospace; font-size: 21px; font-weight: 600;">$1,000</span></div>
+              <span style="font-size: 12px; font-weight: 600; color: #7DF3FC; background: rgba(0,240,255,0.1); border-radius: 999px; padding: 5px 12px;">🔒 Locked</span>
+            </div>
+            <div style="background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 13px; color: #A6A7AD;">Ask me before spending over</span><span style="font-family: 'Geist Mono', monospace; font-size: 21px; font-weight: 600;">$500</span></div>
+              <span style="font-size: 12px; font-weight: 600; color: #7DF3FC; background: rgba(0,240,255,0.1); border-radius: 999px; padding: 5px 12px;">🔒 Locked</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 500; font-size: 14.5px;">Ad Optimizer</span><span style="font-size: 12.5px; color: #6B6B72;">Meta Ads</span></div><span style="color: #7DF3FC; font-size: 13px; font-weight: 600;">● Running</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 500; font-size: 14.5px;">Inventory Planner</span><span style="font-size: 12.5px; color: #6B6B72;">Shopify</span></div><span style="color: #7DF3FC; font-size: 13px; font-weight: 600;">● Running</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 15px 18px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 500; font-size: 14.5px;">Email &amp; SMS</span><span style="font-size: 12.5px; color: #6B6B72;">Klaviyo</span></div><span style="color: #7DF3FC; font-size: 13px; font-weight: 600;">● Running</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #15151A; border: 1px solid rgba(0,240,255,0.35); border-radius: 12px; padding: 15px 18px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 500; font-size: 14.5px;">Finance</span><span style="font-size: 12.5px; color: #6B6B72;">Stripe</span></div><span style="color: #F3F4F6; font-size: 12.5px; font-weight: 600; background: rgba(0,240,255,0.12); border-radius: 999px; padding: 4px 12px;">Needs your OK</span></div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. AGENTIC CAPABILITIES ============ -->
+  <section data-screen-label="Agentic Capabilities" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 40px;">
+      <div data-reveal style="display: flex; flex-direction: column; gap: 16px;">
+        <div data-reveal="trace" style="width: 48px; height: 2px; background: #00F0FF; transform-origin: left;"></div>
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600;">Meet the team</div>
+        <h2 style="margin: 0; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; max-width: 24ch; text-wrap: balance;">Every department of your back office, covered.</h2>
+      </div>
+      <div data-reveal-group style="display: grid; grid-template-columns: repeat({{ bentoCols }}, 1fr); gap: 14px;">
+        <sc-for list="{{ agents }}" as="a" hint-placeholder-count="8">
+          <div style="background: #101014; border: 1px solid #26262B; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px; min-height: 190px; transition: border-color 0.15s ease, transform 0.15s ease;" style-hover="border-color: rgba(0,240,255,0.4); transform: translateY(-2px);">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #7DF3FC;">{{ a.initials }}</div>
+            <div style="font-weight: 600; font-size: 18px;">{{ a.name }}</div>
+            <div style="color: #A6A7AD; font-size: 14px; line-height: 1.55; flex: 1;">{{ a.desc }}</div>
+            <div style="font-size: 13px; color: #7DF3FC; font-weight: 500;">{{ a.sample }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4a. YOUR COMPANY ORG CHART ============ -->
+  <section data-screen-label="Org Chart" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24; background: #0C0C0F;">
+    <div style="max-width: 1100px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 48px;">
+      <div data-reveal style="display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center;">
+        <div data-reveal="trace" style="width: 48px; height: 2px; background: #00F0FF; transform-origin: left;"></div>
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600;">Your new org chart</div>
+        <h2 style="margin: 0; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; max-width: 22ch; text-wrap: balance;">One founder. A whole company underneath.</h2>
+        <p style="margin: 0; color: #A6A7AD; font-size: clamp(15px, 1.5vw, 17px); line-height: 1.6; max-width: 56ch;">You sit at the top and make the calls. Praxis runs every department below — sales, marketing, inventory, support, and finance — using the tools you already have.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <!-- YOU -->
+        <div data-reveal style="display: flex; flex-direction: column; align-items: center; gap: 8px; background: #101014; border: 1px solid rgba(0,240,255,0.45); border-radius: 18px; padding: 20px 40px; box-shadow: 0 0 30px rgba(0,240,255,0.08);">
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(0,240,255,0.12); border: 1px solid rgba(0,240,255,0.35); display: flex; align-items: center; justify-content: center; font-size: 20px;">👋</div>
+          <div style="font-weight: 700; font-size: 17px;">You</div>
+          <div style="font-size: 13px; color: #A6A7AD;">Founder & CEO — the only human required</div>
+        </div>
+
+        <div style="width: 2px; height: 32px; background: #2A2A30;"></div>
+
+        <!-- PRAXIS -->
+        <div data-reveal style="display: flex; align-items: center; gap: 12px; background: #101014; border: 1px solid #26262B; border-radius: 14px; padding: 14px 28px;">
+          <div style="width: 22px; height: 22px; border: 1.5px solid #F3F4F6; border-radius: 3px; display: flex; align-items: center; justify-content: center;"><div style="width: 10px; height: 10px; border: 1.5px solid #00F0FF; transform: rotate(-9deg);"></div></div>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-weight: 600; font-size: 15px;">Praxis</span>
+            <span style="font-size: 12.5px; color: #6B6B72;">Your chief operating system — coordinates everything below</span>
+          </div>
+        </div>
+
+        <div style="width: 2px; height: 32px; background: #2A2A30;"></div>
+
+        <!-- DEPARTMENTS -->
+        <div data-reveal-group style="display: grid; grid-template-columns: repeat({{ orgCols }}, 1fr); gap: 14px; width: 100%;">
+          <sc-for list="{{ departments }}" as="d" hint-placeholder-count="6">
+            <div style="background: #101014; border: 1px solid #26262B; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;" style-hover="border-color: rgba(0,240,255,0.4);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 20px;">{{ d.emoji }}</span>
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-weight: 600; font-size: 15.5px;">{{ d.name }}</span>
+                  <span style="font-size: 12.5px; color: #6B6B72;">{{ d.role }}</span>
+                </div>
+              </div>
+              <div style="font-size: 13.5px; color: #A6A7AD; line-height: 1.55; flex: 1;">{{ d.desc }}</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid #1F1F24; padding-top: 12px;">
+                <sc-for list="{{ d.tools }}" as="t" hint-placeholder-count="2">
+                  <span style="font-size: 11.5px; font-weight: 600; color: #7DF3FC; background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.2); border-radius: 999px; padding: 4px 10px;">{{ t }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4b. DAILY BRIEFING ============ -->
+  <section data-screen-label="Daily Briefing" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: clamp(32px, 5vw, 72px); align-items: center;">
+      <div data-reveal style="display: flex; flex-direction: column; gap: 16px;">
+        <div data-reveal="trace" style="width: 48px; height: 2px; background: #00F0FF; transform-origin: left;"></div>
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600;">Your daily briefing</div>
+        <h2 style="margin: 0; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; max-width: 20ch; text-wrap: balance;">Start every day already caught up.</h2>
+        <p style="margin: 0; color: #A6A7AD; font-size: clamp(15px, 1.5vw, 17px); line-height: 1.6; max-width: 52ch;">Every morning, Praxis writes you a short, human briefing — what happened overnight, what's going well, and the one or two things that actually need you. No dashboards to dig through, no spreadsheet homework.</p>
+        <div style="font-size: 13.5px; color: #6B6B72;">Delivered at 8am — email, SMS, or Slack. Your choice.</div>
+      </div>
+
+      <!-- Briefing card -->
+      <div data-reveal style="border: 1px solid #26262B; border-radius: 20px; background: #101014; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.45);">
+        <div style="padding: 22px 26px; border-bottom: 1px solid #1F1F24; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+          <div style="font-weight: 700; font-size: clamp(19px, 2vw, 23px);">Good morning, Maya ☀️</div>
+          <div style="font-size: 13px; color: #6B6B72;">Saturday, July 5 · 8:00 am</div>
+        </div>
+        <div style="padding: 24px 26px; display: flex; flex-direction: column; gap: 18px;">
+          <p style="margin: 0; font-size: 15px; line-height: 1.65; color: #C9CAD1;">While you were away, your store kept moving — your agents handled <strong style="color: #F3F4F6;">47 tasks</strong> overnight. Here's what actually matters:</p>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="font-size: 16px; flex-shrink: 0;">📈</span>
+              <span style="font-size: 14.5px; line-height: 1.6; color: #C9CAD1;">Yesterday closed at <strong style="color: #F3F4F6;">$12,480</strong> — your best Friday this month. The new ad set is doing most of the heavy lifting.</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="font-size: 16px; flex-shrink: 0;">📦</span>
+              <span style="font-size: 14.5px; line-height: 1.6; color: #C9CAD1;">Your candle set is on pace to sell out in <strong style="color: #F3F4F6;">about 8 days</strong>. A restock is drafted and waiting for your OK.</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="font-size: 16px; flex-shrink: 0;">😌</span>
+              <span style="font-size: 14.5px; line-height: 1.6; color: #C9CAD1;">Nothing went wrong overnight. Margins stayed comfortably above your floor all day.</span>
+            </div>
+          </div>
+          <div style="border: 1px solid rgba(0,240,255,0.3); background: rgba(0,240,255,0.05); border-radius: 12px; padding: 14px 18px; font-size: 14px; line-height: 1.6; color: #C9CAD1;">
+            <strong style="color: #7DF3FC;">One thing for today:</strong> approve the restock before 2pm to keep your supplier's production slot.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. TRUST & GUARDRAILS ============ -->
+  <section data-screen-label="Trust and Guardrails" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24; background: #0C0C0F;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 40px;">
+      <div data-reveal style="display: flex; flex-direction: column; gap: 16px;">
+        <div data-reveal="trace" style="width: 48px; height: 2px; background: #00F0FF; transform-origin: left;"></div>
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600;">You're always in charge</div>
+        <h2 style="margin: 0; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; max-width: 22ch; text-wrap: balance;">Big decisions always come back to you.</h2>
+        <p style="margin: 0; color: #A6A7AD; font-size: clamp(15px, 1.5vw, 17px); line-height: 1.6; max-width: 60ch;">Anything over your limit gets paused, explained in plain language, and waits for your call. Praxis never crosses the lines you draw.</p>
+      </div>
+      <div data-reveal-group style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px;">
+
+        <!-- Left: friendly reasoning -->
+        <div style="background: #101014; border: 1px solid #26262B; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden;">
+          <div style="padding: 16px 22px; border-bottom: 1px solid #1F1F24; font-weight: 600; font-size: 15px;">Why is Praxis asking?</div>
+          <div style="padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;"><span style="width: 24px; height: 24px; border-radius: 8px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">1</span><span style="font-size: 14.5px; line-height: 1.55; color: #C9CAD1;">Your best-seller is down to <strong style="color: #F3F4F6;">312 units</strong> and selling about 41 a day.</span></div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;"><span style="width: 24px; height: 24px; border-radius: 8px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">2</span><span style="font-size: 14.5px; line-height: 1.55; color: #C9CAD1;">At that pace you'd run out in <strong style="color: #F3F4F6;">about 8 days</strong> — and your supplier needs 21 days.</span></div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;"><span style="width: 24px; height: 24px; border-radius: 8px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">3</span><span style="font-size: 14.5px; line-height: 1.55; color: #C9CAD1;">So Praxis drafted a reorder of <strong style="color: #F3F4F6;">5,000 units for $20,500</strong>.</span></div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;"><span style="width: 24px; height: 24px; border-radius: 8px; background: rgba(0,240,255,0.1); color: #7DF3FC; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">4</span><span style="font-size: 14.5px; line-height: 1.55; color: #C9CAD1;">That's over your <strong style="color: #F3F4F6;">$500 limit</strong> — so it stopped and asked you first. ✋</span></div>
+          </div>
+        </div>
+
+        <!-- Right: approval card -->
+        <div style="background: #101014; border: 1px solid rgba(0,240,255,0.3); border-radius: 20px; padding: clamp(20px, 3vw, 30px); display: flex; flex-direction: column; gap: 20px;">
+          <span style="align-self: flex-start; font-size: 12.5px; font-weight: 600; color: #7DF3FC; background: rgba(0,240,255,0.1); border-radius: 999px; padding: 6px 14px;">Waiting for your approval</span>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-weight: 600; font-size: 19px;">Restock your best-seller?</div>
+            <div style="font-size: 14px; color: #A6A7AD;">5,000 units · $20,500 · arrives in ~3 weeks</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 13px 16px;"><div style="font-size: 12px; color: #6B6B72;">Margin impact</div><div style="font-family: 'Geist Mono', monospace; font-size: 17px; font-weight: 600; color: #7DF3FC;">+2.4 pts</div></div>
+            <div style="background: #15151A; border: 1px solid #1F1F24; border-radius: 12px; padding: 13px 16px;"><div style="font-size: 12px; color: #6B6B72;">Stock runs out in</div><div style="font-family: 'Geist Mono', monospace; font-size: 17px; font-weight: 600;">~8 days</div></div>
+          </div>
+          <sc-if value="{{ decisionPending }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; gap: 10px; margin-top: auto;">
+              <button onClick="{{ approve }}" style="flex: 1; height: 50px; border-radius: 12px; background: #00F0FF; color: #0A0A0C; border: none; font-weight: 600; font-size: 15px; font-family: inherit; cursor: pointer;" style-hover="background: #6FF7FF;">Approve</button>
+              <button onClick="{{ reject }}" style="flex: 1; height: 50px; border-radius: 12px; background: transparent; color: #F3F4F6; border: 1px solid #3A3A41; font-weight: 600; font-size: 15px; font-family: inherit; cursor: pointer;" style-hover="border-color: #F3F4F6;">Not now</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ decisionMade }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: auto; border: 1px solid #26262B; border-radius: 12px; background: #15151A; padding: 16px 18px; font-size: 14px; line-height: 1.6;">
+              <div style="font-weight: 600; color: #7DF3FC;">{{ decisionLabel }}</div>
+              <div style="color: #6B6B72;">Logged to your history — you can undo for 24 hours.</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. INTEGRATIONS ============ -->
+  <section data-screen-label="Integrations" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 10vw, 140px) clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 40px;">
+      <div data-reveal style="display: flex; flex-direction: column; gap: 16px;">
+        <div data-reveal="trace" style="width: 48px; height: 2px; background: #00F0FF; transform-origin: left;"></div>
+        <div style="font-size: 14px; color: #7DF3FC; font-weight: 600;">Plays nicely with your stack</div>
+        <h2 style="margin: 0; font-size: clamp(28px, 4.2vw, 52px); line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; max-width: 24ch; text-wrap: balance;">Works with the tools you already use.</h2>
+      </div>
+      <div data-reveal-group style="display: grid; grid-template-columns: repeat({{ logoCols }}, 1fr); gap: 14px;">
+        <sc-for list="{{ integrations }}" as="tool" hint-placeholder-count="8">
+          <div style="background: #101014; border: 1px solid #26262B; border-radius: 16px; height: 92px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #C9CAD1; transition: color 0.15s ease, border-color 0.15s ease;" style-hover="color: #F3F4F6; border-color: rgba(0,240,255,0.4);">{{ tool }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7. FINAL CTA ============ -->
+  <section id="waitlist" data-screen-label="Final CTA" style="position: relative; z-index: 1; border-top: 1px solid #1F1F24;">
+    <div data-reveal-group style="max-width: 720px; margin: 0 auto; padding: clamp(80px, 12vw, 180px) clamp(16px, 4vw, 48px); display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center;">
+      <div style="width: 44px; height: 44px; border: 1.5px solid #F3F4F6; border-radius: 4px; display: flex; align-items: center; justify-content: center;"><div style="width: 20px; height: 20px; border: 2px solid #00F0FF; transform: rotate(-9deg); box-shadow: 0 0 12px rgba(0,240,255,0.55), inset 0 0 6px rgba(0,240,255,0.25);"></div></div>
+      <h2 style="margin: 0; font-size: clamp(30px, 4.6vw, 56px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance;">Run your business. Not your busywork.</h2>
+      <p style="margin: 0; color: #A6A7AD; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6;">Join the waitlist for Praxis AI — early operators get first access.</p>
+      <sc-if value="{{ ctaPending }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submitCta }}" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; max-width: 480px; justify-content: center;">
+          <input ref="{{ ctaEmailRef }}" type="email" required placeholder="you@yourstore.com" style="flex: 1 1 220px; height: 52px; padding: 0 18px; border-radius: 12px; background: #161619; border: 1px solid #2A2A30; color: #F3F4F6; font-size: 15px; outline: none;" style-focus="border-color: #00F0FF;">
+          <button type="submit" style="height: 52px; padding: 0 28px; border-radius: 12px; background: #00F0FF; color: #0A0A0C; border: none; font-weight: 600; font-size: 15px; font-family: inherit; cursor: pointer;" style-hover="background: #6FF7FF;">Join waitlist</button>
+        </form>
+      </sc-if>
+      <sc-if value="{{ ctaDone }}" hint-placeholder-val="{{ false }}">
+        <div style="width: 100%; max-width: 480px; border: 1px solid rgba(0,240,255,0.4); border-radius: 14px; background: rgba(0,240,255,0.05); padding: 20px 24px; font-size: 14.5px; line-height: 1.8; text-align: left;">
+          <div style="font-weight: 600;">You're in — #{{ queuePosition }} on the waitlist. 🎉</div>
+          <div style="color: #A6A7AD;">Invite two friends who run stores and jump ahead 1,000 spots.</div>
+        </div>
+      </sc-if>
+    </div>
+    <footer style="border-top: 1px solid #1F1F24; padding: 24px clamp(16px, 4vw, 48px); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; font-size: 13px; color: #55565E;">
+      <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 16px; height: 16px; border: 1px solid #55565E; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center;"><span style="width: 7px; height: 7px; border: 1px solid #00F0FF; transform: rotate(-9deg); display: inline-block;"></span></span>© 2026 Praxis AI</span>
+      <span>The engine for autonomous companies</span>
+    </footer>
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;gridLines&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Aesthetic&quot; },
+  &quot;liveActivity&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Motion&quot; },
+  &quot;queuePosition&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 4201, &quot;min&quot;: 1, &quot;max&quot;: 99999, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Waitlist&quot; }
+}">
+const FEED_POOL = [
+  { initials: 'AO', name: 'Ad Optimizer', msg: 'Moved $500 to your best-performing ad set', chip: '4.2× return' },
+  { initials: 'IP', name: 'Inventory Planner', msg: 'Your candle set is selling 18% faster — updated the reorder plan', chip: 'On track' },
+  { initials: 'EM', name: 'Email & SMS', msg: 'Sent your winback email to 2,841 lapsed customers', chip: 'Sent ✓' },
+  { initials: 'AO', name: 'Ad Optimizer', msg: 'Paused an underperforming ad before it wasted more budget', chip: 'Saved $120' },
+  { initials: 'FI', name: 'Finance', msg: 'Checked your margins — comfortably above your 38% floor', chip: '41.2% ✓' },
+  { initials: 'IP', name: 'Inventory Planner', msg: 'Drafted a big restock order and flagged it for your approval', chip: 'Needs you' },
+  { initials: 'SU', name: 'Support', msg: 'Refunded a $42 order — well within your limits', chip: 'Done ✓' },
+  { initials: 'EM', name: 'Email & SMS', msg: 'Your A/B test finished — the winning subject line is live', chip: '+12% opens' },
+];
+
+const AGENTS = [
+  { initials: 'SA', name: 'Sales', desc: 'Keeps prices and promos healthy — always above your margin floor.', sample: 'Adjusted 3 prices today' },
+  { initials: 'PU', name: 'Publishing', desc: 'Writes and ships product copy and campaigns in your brand voice.', sample: '12 pages refreshed' },
+  { initials: 'RE', name: 'Reporting', desc: 'A plain-language daily brief: what happened, what it earned you.', sample: 'Your 8am briefing, ready' },
+  { initials: 'AO', name: 'Ad Optimizer', desc: 'Shifts ad budget to what\'s working — hourly, within your caps.', sample: 'Moved $500 to a winner' },
+  { initials: 'IP', name: 'Inventory', desc: 'Spots stockouts weeks ahead and drafts reorders for your OK.', sample: 'Restock drafted for you' },
+  { initials: 'EM', name: 'Email & SMS', desc: 'Runs your flows end-to-end and picks A/B winners on its own.', sample: 'Winback flow live' },
+  { initials: 'SU', name: 'Support', desc: 'Handles refunds and reships under your limit. Edge cases come to you.', sample: '14 tickets resolved' },
+  { initials: 'FI', name: 'Finance', desc: 'Reconciles payouts and taps the brakes if anything nears a limit.', sample: 'All payouts matched ✓' },
+];
+
+const DEPARTMENTS = [
+  { emoji: '🛍️', name: 'Sales', role: 'Head of Sales', desc: 'Manages your prices, promos, and product listings — and closes the gap when a day runs slow.', tools: ['Shopify', 'Stripe'] },
+  { emoji: '📣', name: 'Marketing', role: 'Head of Ads', desc: 'Runs your ad budget across channels, hour by hour, always inside your spend caps.', tools: ['Meta Ads', 'Google Ads', 'TikTok Shop'] },
+  { emoji: '💌', name: 'Email & SMS', role: 'Lifecycle lead', desc: 'Sends the right message at the right time — welcomes, winbacks, and everything between.', tools: ['Klaviyo'] },
+  { emoji: '📦', name: 'Inventory', role: 'Operations lead', desc: 'Watches your stock weeks ahead and drafts reorders before you ever run out.', tools: ['Shopify', 'ShipBob'] },
+  { emoji: '🤝', name: 'Support', role: 'Customer care', desc: 'Resolves refunds and reships within your limits. Tricky cases come straight to you.', tools: ['Gorgias'] },
+  { emoji: '🧮', name: 'Finance', role: 'Your CFO', desc: 'Reconciles every payout and guards your margin floor — nothing slips through.', tools: ['Stripe', 'Shopify'] },
+];
+
+const INTEGRATIONS = ['Shopify', 'Meta Ads', 'Klaviyo', 'Stripe', 'Google Ads', 'TikTok Shop', 'Gorgias', 'ShipBob'];
+
+function fakeTime(i) {
+  const base = 14 * 3600 + 6 * 60 + 12 + i * 47;
+  const h = Math.floor(base / 3600) % 24;
+  const m = String(Math.floor(base / 60) % 60).padStart(2, '0');
+  const h12 = ((h + 11) % 12) + 1;
+  return h12 + ':' + m + ' pm';
+}
+
+class Component extends DCLogic {
+  state = {
+    tick: 5,
+    heroDone: false,
+    ctaDone: false,
+    activeStep: 0,
+    userPicked: false,
+    decision: null,
+    actionCount: 1247,
+    vw: 1280,
+  };
+
+  componentDidMount() {
+    this.heroEmailRef = this.heroEmailRef || React.createRef();
+    this.ctaEmailRef = this.ctaEmailRef || React.createRef();
+    this.onResize = () => this.setState({ vw: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.onResize();
+    this.onScroll = () => {
+      const el = this.progressRef && this.progressRef.current;
+      if (!el) return;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      el.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    requestAnimationFrame(() => this.setupMotion());
+    this.logTimer = setInterval(() => {
+      if (this.props.liveActivity === false) return;
+      this.setState(s => ({ tick: s.tick + 1, actionCount: s.actionCount + 1 }));
+    }, 2400);
+    this.stepTimer = setInterval(() => {
+      if (this.props.liveActivity === false) return;
+      this.setState(s => s.userPicked ? null : ({ activeStep: (s.activeStep + 1) % 3 }));
+    }, 4000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.logTimer);
+    clearInterval(this.stepTimer);
+    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('scroll', this.onScroll);
+    if (this.io) this.io.disconnect();
+  }
+
+  setupMotion() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    const prep = (el, delay, kind) => {
+      if (kind === 'trace') {
+        el.style.transform = 'scaleX(0)';
+        el.style.transition = 'transform 0.9s ' + ease + ' ' + delay + 'ms';
+      } else {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(26px)';
+        el.style.filter = 'blur(8px)';
+        el.style.transition = ['opacity', 'transform', 'filter'].map(p => p + ' 0.75s ' + ease + ' ' + delay + 'ms').join(', ');
+      }
+    };
+    const show = (el) => {
+      if (el.dataset.reveal === 'trace') { el.style.transform = 'scaleX(1)'; return; }
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+      el.style.filter = 'blur(0px)';
+    };
+    this.io = new IntersectionObserver((entries) => {
+      for (const en of entries) {
+        if (!en.isIntersecting) continue;
+        const el = en.target;
+        if (el.__kids) el.__kids.forEach(show); else show(el);
+        this.io.unobserve(el);
+      }
+    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      prep(el, 0, el.dataset.reveal === 'trace' ? 'trace' : 'block');
+      this.io.observe(el);
+    });
+    document.querySelectorAll('[data-reveal-group]').forEach(g => {
+      const kids = Array.from(g.children);
+      kids.forEach((k, i) => prep(k, i * 90, 'block'));
+      g.__kids = kids;
+      this.io.observe(g);
+    });
+  }
+
+  stepStyle(i) {
+    const active = this.state.activeStep === i;
+    return {
+      display: 'flex', gap: '16px', alignItems: 'flex-start', width: '100%',
+      background: active ? '#121217' : 'transparent',
+      border: '1px solid ' + (active ? 'rgba(0,240,255,0.35)' : '#1F1F24'),
+      borderRadius: '16px',
+      color: '#F3F4F6', padding: '18px 20px', cursor: 'pointer',
+      font: 'inherit', textAlign: 'left', transition: 'all 0.2s ease',
+    };
+  }
+
+  renderVals() {
+    if (!this.heroEmailRef) this.heroEmailRef = React.createRef();
+    if (!this.ctaEmailRef) this.ctaEmailRef = React.createRef();
+    if (!this.progressRef) this.progressRef = React.createRef();
+    const { tick, activeStep, decision } = this.state;
+
+    const items = [];
+    for (let i = Math.max(0, tick - 5); i < tick; i++) {
+      const e = FEED_POOL[i % FEED_POOL.length];
+      items.push({ ...e, time: fakeTime(i) });
+    }
+    items.reverse();
+
+    const vw = this.state.vw || 1280;
+    const panelTitles = ['Connections', 'Your limits', 'Your agents'];
+    const queuePos = (this.props.queuePosition ?? 4201).toLocaleString('en-US');
+
+    return {
+      bentoCols: vw >= 1000 ? 4 : (vw >= 560 ? 2 : 1),
+      orgCols: vw >= 900 ? 3 : (vw >= 560 ? 2 : 1),
+      departments: DEPARTMENTS,
+      logoCols: vw >= 760 ? 4 : 2,
+      gridOn: this.props.gridLines ?? true,
+      feedItems: items,
+      actionCount: this.state.actionCount.toLocaleString('en-US'),
+      agents: AGENTS,
+      integrations: INTEGRATIONS,
+      queuePosition: queuePos,
+
+      heroPending: !this.state.heroDone,
+      heroDone: this.state.heroDone,
+      ctaPending: !this.state.ctaDone,
+      ctaDone: this.state.ctaDone,
+      heroEmailRef: this.heroEmailRef,
+      ctaEmailRef: this.ctaEmailRef,
+      progressRef: this.progressRef,
+      submitHero: (e) => { e.preventDefault(); this.setState({ heroDone: true }); },
+      submitCta: (e) => { e.preventDefault(); this.setState({ ctaDone: true }); },
+
+      isStep0: activeStep === 0,
+      isStep1: activeStep === 1,
+      isStep2: activeStep === 2,
+      step0Style: this.stepStyle(0),
+      step1Style: this.stepStyle(1),
+      step2Style: this.stepStyle(2),
+      selectStep0: () => this.setState({ activeStep: 0, userPicked: true }),
+      selectStep1: () => this.setState({ activeStep: 1, userPicked: true }),
+      selectStep2: () => this.setState({ activeStep: 2, userPicked: true }),
+      panelTitle: panelTitles[activeStep],
+
+      decisionPending: decision === null,
+      decisionMade: decision !== null,
+      decisionLabel: decision === 'approved' ? 'Approved — your order is on its way to the supplier.' : 'Skipped — Praxis will keep an eye on stock and check back.',
+      approve: () => this.setState({ decision: 'approved' }),
+      reject: () => this.setState({ decision: 'rejected' }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
