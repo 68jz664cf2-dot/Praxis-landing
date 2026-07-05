@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { QUEUE_POSITION } from "./data";
+import { welcomeEmail } from "./welcome-email";
 import { gmailConfigured, sendWelcomeEmail, notifyFounder } from "./mailer";
 
 export type WaitlistResult =
@@ -8,10 +9,17 @@ export type WaitlistResult =
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Resend stores the contact list; Gmail (SMTP) sends the welcome email.
+// Resend stores the contact list and can also send (HTTP API — reliable from
+// serverless). Gmail SMTP is the alternative sender. Whichever is configured wins.
 const RESEND_KEY = process.env.RESEND_API_KEY;
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
+const RESEND_FROM = process.env.RESEND_FROM ?? "Praxis AI <onboarding@resend.dev>";
 const BASE_POSITION = Number(process.env.WAITLIST_BASE_POSITION) || QUEUE_POSITION;
+
+const canStore = Boolean(RESEND_KEY && AUDIENCE_ID);
+const canSendGmail = gmailConfigured;
+const canSendResend = Boolean(RESEND_KEY && RESEND_FROM);
+const canSend = canSendGmail || canSendResend;
 
 /**
  * The displayed queue position — a configured marketing anchor. Swap in a
@@ -31,25 +39,24 @@ export async function joinWaitlist(
   }
 
   const position = queuePosition();
-  const resendConfigured = Boolean(RESEND_KEY && AUDIENCE_ID);
 
   // Dev fallback: nothing configured → capture succeeds without external calls,
   // so the form is fully functional locally. Add creds to go live.
-  if (!resendConfigured && !gmailConfigured) {
+  if (!canStore && !canSend) {
     console.warn(
-      `[waitlist] no Resend/Gmail creds — captured ${email} (${source}) in dev mode; nothing sent/stored.`,
+      `[waitlist] no email/storage creds — captured ${email} (${source}) in dev mode; nothing sent/stored.`,
     );
     return { ok: true, position, alreadyJoined: false };
   }
 
+  const resend = RESEND_KEY ? new Resend(RESEND_KEY) : null;
   let alreadyJoined = false;
   let storeFailed = false;
-  let emailFailed = false;
+  let sendFailed = false;
 
   // 1. Store the signup as a contact in the Resend Audience.
-  if (resendConfigured) {
+  if (canStore && resend) {
     try {
-      const resend = new Resend(RESEND_KEY);
       const { error } = await resend.contacts.create({
         email,
         audienceId: AUDIENCE_ID!,
@@ -68,21 +75,37 @@ export async function joinWaitlist(
     }
   }
 
-  // 2. Send the welcome email from Gmail (and a founder notification).
-  if (gmailConfigured) {
+  // 2. Send the welcome email — Gmail SMTP if configured, else Resend.
+  if (canSendGmail) {
     try {
       await sendWelcomeEmail(email, position);
+      void notifyFounder(email, source); // fire-and-forget, never throws
     } catch (err) {
-      emailFailed = true;
-      console.error("[waitlist] welcome email failed:", err);
+      sendFailed = true;
+      console.error("[waitlist] Gmail welcome email failed:", err);
     }
-    void notifyFounder(email, source); // fire-and-forget, never throws
+  } else if (canSendResend && resend) {
+    try {
+      const { error } = await resend.emails.send({
+        from: RESEND_FROM,
+        to: email,
+        subject: "You're on the Praxis AI waitlist 🎉",
+        html: welcomeEmail(position),
+      });
+      if (error) {
+        sendFailed = true;
+        console.error("[waitlist] Resend welcome email failed:", error.message);
+      }
+    } catch (err) {
+      sendFailed = true;
+      console.error("[waitlist] Resend welcome email threw:", err);
+    }
   }
 
   // If every configured sink failed, we truly didn't record the signup.
-  const configuredCount = (resendConfigured ? 1 : 0) + (gmailConfigured ? 1 : 0);
-  const failedCount = (storeFailed ? 1 : 0) + (emailFailed ? 1 : 0);
-  if (configuredCount > 0 && failedCount === configuredCount) {
+  const configured = (canStore ? 1 : 0) + (canSend ? 1 : 0);
+  const failed = (storeFailed ? 1 : 0) + (sendFailed ? 1 : 0);
+  if (configured > 0 && failed === configured) {
     return { ok: false, error: "Something went wrong. Please try again." };
   }
 

@@ -37,18 +37,25 @@ npm run start    # serve the production build
 Interactive behavior (feed ticking, step auto-advance, approve/reject, waitlist
 success with queue position) is verified end-to-end at desktop and mobile widths.
 
-## Waitlist (Gmail send + Resend list)
+## Waitlist
 
 Both signup forms POST to `app/api/waitlist/route.ts` → `lib/waitlist.ts`, which:
 
 1. Validates + normalizes the email.
-2. Stores the signup as a contact in a **Resend Audience** (`lib/waitlist.ts`).
-3. Sends an on-brand **welcome email** from **Gmail SMTP** (`lib/mailer.ts`,
-   template in `lib/welcome-email.ts`) and a "new signup" heads-up to you.
+2. Stores the signup as a contact in a **Resend Audience** (if configured).
+3. Sends an on-brand **welcome email** (template in `lib/welcome-email.ts`) via
+   whichever sender is configured — **Gmail SMTP** (`lib/mailer.ts`) if the
+   `GMAIL_*` vars are set, otherwise **Resend**. Gmail also sends a "new signup"
+   heads-up to you.
 
-The two sinks are independent and best-effort: a signup only fails if *every*
+Storage + send are independent and best-effort: a signup only fails if *every*
 configured sink fails. With no credentials at all, it runs in a **dev fallback**
-that captures + logs locally so the form works immediately.
+that captures + logs locally, so the form works immediately.
+
+> **Serverless + SMTP:** many hosts (incl. Vercel) block/throttle outbound SMTP,
+> so Gmail may be unreliable in production. Sending via **Resend from a domain you
+> verify** (e.g. `praxisio.io`) uses HTTP and works everywhere — the recommended
+> production path. Set `RESEND_FROM` to e.g. `Praxis AI <customer@praxisio.io>`.
 
 ### Config
 
@@ -56,16 +63,17 @@ Copy `.env.example` → `.env.local` (or set these in your host):
 
 | Variable                 | Purpose                                                                 |
 | ------------------------ | ----------------------------------------------------------------------- |
-| `GMAIL_USER`             | Gmail address that sends the welcome email.                             |
-| `GMAIL_APP_PASSWORD`     | 16-char **App Password** (needs 2-Step Verification). Never your login. |
+| `GMAIL_USER`             | Gmail/Workspace address that sends the welcome email (Option A).         |
+| `GMAIL_APP_PASSWORD`     | 16-char **App Password** (needs 2-Step Verification). Never your login.  |
 | `GMAIL_NOTIFY`           | Where "new signup" alerts go (defaults to `GMAIL_USER`).               |
-| `RESEND_API_KEY`         | Resend API key — stores signups as contacts.                           |
+| `RESEND_API_KEY`         | Resend API key — stores contacts and/or sends (Option B).              |
 | `RESEND_AUDIENCE_ID`     | Resend Audience to store contacts in.                                   |
+| `RESEND_FROM`            | Verified-domain sender used when sending via Resend.                    |
 | `WAITLIST_BASE_POSITION` | Number shown as the queue position (default `4201`).                    |
 
 Gmail App Password: enable 2-Step Verification, then create one at
-<https://myaccount.google.com/apppasswords>. Free Gmail sends ~500 emails/day
-(Workspace ~2,000); for higher volume move to a domain-verified sender.
+<https://myaccount.google.com/apppasswords> (Workspace accounts also need the
+admin to allow App Passwords). Free Gmail ~500 emails/day, Workspace ~2,000.
 
 > Queue position is a fixed marketing anchor. For a truly incrementing position,
 > back it with a datastore counter in `lib/waitlist.ts`.
