@@ -11,7 +11,7 @@ export default function OrgChart() {
           eyebrow="Your new org chart"
           title="One founder. A whole company underneath."
           titleMaxCh={22}
-          description="You sit at the top and make the calls. Praxis runs every department below — sales, marketing, inventory, support, and finance — using the tools you already have."
+          description="You sit at the top and make the calls. Praxis runs every department below — sales, marketing, finance, operations, and support — using the tools you already have. Any business, zero headcount."
         />
 
         <div className="flex flex-col items-center">

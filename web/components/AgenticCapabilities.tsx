@@ -7,7 +7,7 @@ export default function AgenticCapabilities() {
       <div className="mx-auto flex max-w-[1280px] flex-col gap-10 px-[clamp(16px,4vw,48px)] py-[clamp(64px,10vw,140px)]">
         <SectionHeading
           eyebrow="Meet the team"
-          title="Every department of your back office, covered."
+          title="Every department of your company, run by agents."
           titleMaxCh={24}
         />
         <div

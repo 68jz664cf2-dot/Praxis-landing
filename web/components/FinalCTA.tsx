@@ -13,7 +13,8 @@ export default function FinalCTA() {
           Run your business. Not your busywork.
         </h2>
         <p className="m-0 text-[clamp(15px,1.6vw,18px)] leading-[1.6] text-muted">
-          Join the waitlist for Praxis AI — early operators get first access.
+          The operating system that runs your whole company — so you can build
+          with zero headcount. Early operators get first access.
         </p>
         <WaitlistForm variant="cta" />
       </div>

@@ -31,7 +31,7 @@ export default function DailyBriefing() {
           </div>
           <div className="flex flex-col gap-[18px] px-[26px] py-6">
             <p className="m-0 text-[15px] leading-[1.65] text-ink">
-              While you were away, your store kept moving — your agents handled{" "}
+              While you were away, your business kept moving — your agents handled{" "}
               <strong className="text-frost">47 tasks</strong> overnight.
               Here&apos;s what actually matters:
             </p>

@@ -54,14 +54,14 @@ export const DEPARTMENTS: Department[] = [
 ];
 
 export const INTEGRATIONS = [
-  "Shopify",
-  "Meta Ads",
-  "Klaviyo",
   "Stripe",
-  "Google Ads",
-  "TikTok Shop",
-  "Gorgias",
-  "ShipBob",
+  "QuickBooks",
+  "HubSpot",
+  "Meta Ads",
+  "Slack",
+  "Google Workspace",
+  "Shopify",
+  "Notion",
 ];
 
 // Default post-signup queue position shown after joining the waitlist.

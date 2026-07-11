@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const STEPS = [
   {
     title: "Connect your tools",
-    desc: "One-click sign-in to Shopify, Meta, Klaviyo, and Stripe. Takes about two minutes.",
+    desc: "One-click sign-in to the tools you already run on — payments, ads, email, and more. Takes about two minutes.",
   },
   {
     title: "Set your limits",

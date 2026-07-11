@@ -19,9 +19,9 @@ export default function ValidationGap() {
               Copilots only suggest.
             </div>
             <p className="m-0 text-[15px] leading-[1.6] text-muted">
-              Every recommendation still routes through you. Ad budgets,
-              reorders, price changes — a queue of decisions that only grows
-              with your store.
+              Every recommendation still routes through you. Budgets, orders,
+              campaigns, follow-ups — a queue of decisions that only grows as
+              your company grows.
             </p>
           </div>
           <div className="flex flex-col gap-3 rounded-[18px] border border-cyan/30 bg-panel p-[clamp(24px,3vw,40px)]">

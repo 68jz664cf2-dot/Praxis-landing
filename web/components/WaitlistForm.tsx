@@ -57,7 +57,7 @@ export default function WaitlistForm({ variant }: { variant: Variant }) {
           You&apos;re in — #{queueLabel} on the waitlist. 🎉
         </div>
         <div className="text-muted">
-          Invite two friends who run stores and jump ahead 1,000 spots.
+          Invite two friends who are building something and jump ahead 1,000 spots.
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ export default function WaitlistForm({ variant }: { variant: Variant }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={submitting}
-          placeholder="you@yourstore.com"
+          placeholder="you@company.com"
           className={`${fieldCls} w-full`}
         />
         <div className="flex gap-[10px]">

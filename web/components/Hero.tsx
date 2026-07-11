@@ -39,9 +39,9 @@ export default function Hero() {
             Connect your business. Set your limits. Let AI operate the rest.
           </p>
           <p className="m-0 max-w-[48ch] text-[clamp(14px,1.4vw,16px)] leading-[1.6] text-dim">
-            You bring the idea. Praxis becomes your whole back office — sales,
-            ads, inventory, email, support — a team of departments that never
-            sleeps.
+            You bring the idea. Praxis becomes your whole company — sales,
+            marketing, finance, operations, support — every department run by
+            agents, so you can build a real business with zero headcount.
           </p>
           <WaitlistForm variant="hero" />
           <div className="text-[13.5px] text-faint">
