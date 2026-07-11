@@ -101,7 +101,7 @@ function Row({ children }: { children: React.ReactNode }) {
 }
 
 function ConnectionsPanel() {
-  const connected = ["Shopify", "Meta Ads", "Klaviyo"];
+  const connected = ["Stripe", "HubSpot", "Google Workspace"];
   return (
     <div className="flex flex-col gap-[10px] p-5">
       {connected.map((name) => (
@@ -113,7 +113,7 @@ function ConnectionsPanel() {
         </Row>
       ))}
       <Row>
-        <span className="font-medium">Stripe</span>
+        <span className="font-medium">QuickBooks</span>
         <span className="text-[13px] text-muted">Connecting…</span>
       </Row>
     </div>
@@ -138,7 +138,7 @@ function LimitsPanel() {
   return (
     <div className="flex flex-col gap-[10px] p-5">
       <LimitRow label="Never let my margin drop below" value="38.0%" />
-      <LimitRow label="Max ad spend per day" value="$1,000" />
+      <LimitRow label="Max spend per day" value="$1,000" />
       <LimitRow label="Ask me before spending over" value="$500" />
     </div>
   );
@@ -179,10 +179,10 @@ function AgentRow({
 function AgentsPanel() {
   return (
     <div className="flex flex-col gap-[10px] p-5">
-      <AgentRow name="Ad Optimizer" tool="Meta Ads" />
-      <AgentRow name="Inventory Planner" tool="Shopify" />
-      <AgentRow name="Email & SMS" tool="Klaviyo" />
-      <AgentRow name="Finance" tool="Stripe" running={false} />
+      <AgentRow name="Sales" tool="HubSpot" />
+      <AgentRow name="Marketing" tool="Meta Ads" />
+      <AgentRow name="Finance" tool="Stripe" />
+      <AgentRow name="Operations" tool="Slack" running={false} />
     </div>
   );
 }

@@ -38,24 +38,23 @@ export default function DailyBriefing() {
             <div className="flex flex-col gap-[14px]">
               <BriefLine emoji="📈">
                 Yesterday closed at{" "}
-                <strong className="text-frost">$12,480</strong> — your best
-                Friday this month. The new ad set is doing most of the heavy
-                lifting.
+                <strong className="text-frost">$12,480</strong> — your best day
+                this month. The new campaign is doing most of the heavy lifting.
               </BriefLine>
-              <BriefLine emoji="📦">
-                Your candle set is on pace to sell out in{" "}
-                <strong className="text-frost">about 8 days</strong>. A restock
-                is drafted and waiting for your OK.
+              <BriefLine emoji="🧾">
+                A <strong className="text-frost">$20,500 vendor invoice</strong>{" "}
+                came in — it&apos;s over your limit, so it&apos;s drafted and
+                waiting for your OK.
               </BriefLine>
               <BriefLine emoji="😌">
-                Nothing went wrong overnight. Margins stayed comfortably above
-                your floor all day.
+                Nothing went wrong overnight. Spending stayed comfortably inside
+                your limits all day.
               </BriefLine>
             </div>
             <div className="rounded-xl border border-cyan/30 bg-cyan/5 px-[18px] py-[14px] text-sm leading-[1.6] text-ink">
               <strong className="text-cyan-ice">One thing for today:</strong>{" "}
-              approve the restock before 2pm to keep your supplier&apos;s
-              production slot.
+              approve the vendor invoice before 2pm to keep your early-payment
+              discount.
             </div>
           </div>
         </div>

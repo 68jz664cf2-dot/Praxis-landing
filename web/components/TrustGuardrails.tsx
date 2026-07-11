@@ -5,21 +5,19 @@ import SectionHeading from "./SectionHeading";
 
 const REASONS = [
   <>
-    Your best-seller is down to <strong className="text-frost">312 units</strong>{" "}
-    and selling about 41 a day.
+    A <strong className="text-frost">$20,500 invoice</strong> came in from a
+    vendor you already work with.
   </>,
   <>
-    At that pace you&apos;d run out in{" "}
-    <strong className="text-frost">about 8 days</strong> — and your supplier
-    needs 21 days.
+    It matches the order you approved, and the vendor is{" "}
+    <strong className="text-frost">verified</strong>. ✓
   </>,
   <>
-    So Praxis drafted a reorder of{" "}
-    <strong className="text-frost">5,000 units for $20,500</strong>.
+    It&apos;s within budget — but it&apos;s over your{" "}
+    <strong className="text-frost">$500 auto-approve limit</strong>.
   </>,
   <>
-    That&apos;s over your <strong className="text-frost">$500 limit</strong> — so
-    it stopped and asked you first. ✋
+    So Praxis paused and brought it to you before paying. ✋
   </>,
 ];
 
@@ -66,22 +64,22 @@ export default function TrustGuardrails() {
             </span>
             <div className="flex flex-col gap-[6px]">
               <div className="text-[19px] font-semibold">
-                Restock your best-seller?
+                Approve this $20,500 payment?
               </div>
               <div className="text-sm text-muted">
-                5,000 units · $20,500 · arrives in ~3 weeks
+                Acme Co. · invoice #4471 · due in 5 days
               </div>
             </div>
             <div className="grid grid-cols-2 gap-[10px]">
               <div className="rounded-xl border border-line bg-panel-2 px-4 py-[13px]">
-                <div className="text-xs text-faint">Margin impact</div>
+                <div className="text-xs text-faint">Cash impact</div>
                 <div className="tnum text-[17px] font-semibold text-cyan-ice">
-                  +2.4 pts
+                  −$20,500
                 </div>
               </div>
               <div className="rounded-xl border border-line bg-panel-2 px-4 py-[13px]">
-                <div className="text-xs text-faint">Stock runs out in</div>
-                <div className="tnum text-[17px] font-semibold">~8 days</div>
+                <div className="text-xs text-faint">Payment due in</div>
+                <div className="tnum text-[17px] font-semibold">5 days</div>
               </div>
             </div>
 
@@ -104,8 +102,8 @@ export default function TrustGuardrails() {
               <div className="mt-auto rounded-xl border border-line-2 bg-panel-2 px-[18px] py-4 text-sm leading-[1.6]">
                 <div className="font-semibold text-cyan-ice">
                   {decision === "approved"
-                    ? "Approved — your order is on its way to the supplier."
-                    : "Skipped — Praxis will keep an eye on stock and check back."}
+                    ? "Approved — the payment is scheduled to send."
+                    : "Held — Praxis will keep it drafted and check back with you."}
                 </div>
                 <div className="text-faint">
                   Logged to your history — you can undo for 24 hours.
