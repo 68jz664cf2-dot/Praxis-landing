@@ -31,6 +31,38 @@ function queuePosition(): number {
   return BASE_POSITION;
 }
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Store the signup as a Resend Audience contact, retrying transient failures so
+ * we never silently drop a registration. A duplicate email counts as success.
+ */
+async function storeContact(
+  resend: Resend,
+  email: string,
+  attempts = 3,
+): Promise<{ ok: boolean; alreadyJoined: boolean }> {
+  let lastErr = "";
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const { error } = await resend.contacts.create({
+        email,
+        audienceId: AUDIENCE_ID!,
+        unsubscribed: false,
+      });
+      if (!error) return { ok: true, alreadyJoined: false };
+      if (/already|exist/i.test(error.message))
+        return { ok: true, alreadyJoined: true };
+      lastErr = error.message;
+    } catch (err) {
+      lastErr = err instanceof Error ? err.message : String(err);
+    }
+    if (i < attempts - 1) await delay(300 * (i + 1));
+  }
+  console.error(`[waitlist] contact.create failed after ${attempts} tries: ${lastErr}`);
+  return { ok: false, alreadyJoined: false };
+}
+
 export async function joinWaitlist(
   rawEmail: unknown,
   source: "hero" | "cta" | "unknown" = "unknown",
@@ -56,25 +88,11 @@ export async function joinWaitlist(
   let storeFailed = false;
   let sendFailed = false;
 
-  // 1. Store the signup as a contact in the Resend Audience.
+  // 1. Store the signup as a contact in the Resend Audience (with retries).
   if (canStore && resend) {
-    try {
-      const { error } = await resend.contacts.create({
-        email,
-        audienceId: AUDIENCE_ID!,
-        unsubscribed: false,
-      });
-      if (error) {
-        if (/already|exist/i.test(error.message)) alreadyJoined = true;
-        else {
-          storeFailed = true;
-          console.error("[waitlist] contact.create failed:", error.message);
-        }
-      }
-    } catch (err) {
-      storeFailed = true;
-      console.error("[waitlist] contact.create threw:", err);
-    }
+    const stored = await storeContact(resend, email);
+    storeFailed = !stored.ok;
+    alreadyJoined = stored.alreadyJoined;
   }
 
   // 2. Send the welcome email — Gmail SMTP if configured, else Resend.
@@ -104,12 +122,15 @@ export async function joinWaitlist(
     }
   }
 
-  // If every configured sink failed, we truly didn't record the signup.
-  const configured = (canStore ? 1 : 0) + (canSend ? 1 : 0);
-  const failed = (storeFailed ? 1 : 0) + (sendFailed ? 1 : 0);
-  if (configured > 0 && failed === configured) {
+  // Storage is authoritative: if we were supposed to save the signup but
+  // couldn't (after retries), never report success — the person should retry.
+  if (canStore && storeFailed) {
+    return { ok: false, error: "We couldn't save your spot. Please try again." };
+  }
+  // No storage configured but sending is, and the send failed → surface it.
+  if (!canStore && canSend && sendFailed) {
     return { ok: false, error: "Something went wrong. Please try again." };
   }
-
+  // Stored OK; a failed welcome email is secondary and doesn't lose the signup.
   return { ok: true, position, alreadyJoined };
 }
