@@ -15,16 +15,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email, source } =
-    (body as { email?: unknown; source?: "hero" | "cta" }) ?? {};
+  const b = (body ?? {}) as Record<string, unknown>;
+  const result = await joinWaitlist({
+    fullName: b.fullName,
+    email: b.email,
+    country: b.country,
+    age: b.age,
+    source: b.source === "hero" || b.source === "cta" ? b.source : "unknown",
+  });
 
-  const result = await joinWaitlist(
-    email,
-    source === "hero" || source === "cta" ? source : "unknown",
-  );
-
-  if (!result.ok) {
-    return NextResponse.json(result, { status: 400 });
-  }
-  return NextResponse.json(result, { status: 200 });
+  return NextResponse.json(result, { status: result.ok ? 200 : 400 });
 }

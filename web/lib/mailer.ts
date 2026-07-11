@@ -30,12 +30,12 @@ function getTransporter() {
 }
 
 /** Send the branded welcome email to a new signup. Throws on SMTP failure. */
-export async function sendWelcomeEmail(to: string, position: number) {
+export async function sendWelcomeEmail(to: string, position: number, name?: string) {
   await getTransporter().sendMail({
     from: `"Praxis AI" <${USER}>`,
     to,
     subject: "You're on the Praxis AI waitlist 🎉",
-    html: welcomeEmail(position),
+    html: welcomeEmail(position, name),
   });
 }
 

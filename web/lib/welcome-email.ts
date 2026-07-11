@@ -1,8 +1,15 @@
 // Digital-Twilight-branded welcome email. Inline styles only — email clients
 // strip <style>/class-based CSS, so every rule lives on the element.
 
-export function welcomeEmail(position: number): string {
+// First name for a friendly greeting, from a full name.
+function firstName(name?: string): string {
+  const first = (name ?? "").trim().split(/\s+/)[0];
+  return first || "there";
+}
+
+export function welcomeEmail(position: number, name?: string): string {
   const pos = position.toLocaleString("en-US");
+  const hi = firstName(name);
   return `<!doctype html>
 <html>
   <body style="margin:0;padding:0;background:#0a0a0c;color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
@@ -20,7 +27,7 @@ export function welcomeEmail(position: number): string {
             <!-- Card -->
             <tr>
               <td style="background:#101014;border:1px solid #26262b;border-radius:20px;padding:32px;">
-                <div style="font-size:24px;font-weight:700;line-height:1.2;color:#f3f4f6;">You're on the waitlist. 🎉</div>
+                <div style="font-size:24px;font-weight:700;line-height:1.2;color:#f3f4f6;">You're on the waitlist, ${hi}. 🎉</div>
                 <div style="margin-top:20px;padding:18px 20px;background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.4);border-radius:14px;">
                   <div style="font-size:13px;color:#a6a7ad;">Your position</div>
                   <div style="font-size:28px;font-weight:700;color:#00f0ff;font-variant-numeric:tabular-nums;">#${pos}</div>
